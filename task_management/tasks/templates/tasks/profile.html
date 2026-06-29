@@ -1,0 +1,95 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}User Profile - {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+    <tr>
+        <td>
+            <font face="Arial, Helvetica, sans-serif" size="5"><b>User Profile: {{ profile_user.username }}</b></font>
+            <hr color="#003366">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table width="100%" border="0" cellpadding="10" cellspacing="0">
+                <tr valign="top">
+                    <!-- Profile Information Summary & Image -->
+                    <td width="35%" bgcolor="#F9F9F9">
+                        <table width="100%" border="0" cellpadding="8" cellspacing="0">
+                            <tr>
+                                <td align="center">
+                                    {% if profile.profile_image %}
+                                        <img src="{{ profile.profile_image.url }}" alt="Profile Photo" width="180" border="2">
+                                    {% else %}
+                                        <table width="180" height="180" border="1" cellpadding="0" cellspacing="0" bgcolor="#DDDDDD">
+                                            <tr>
+                                                <td align="center" valign="middle">
+                                                    <font face="Arial, Helvetica, sans-serif" size="2" color="#666666">
+                                                        No Image Uploaded
+                                                    </font>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <font face="Arial, Helvetica, sans-serif" size="3">
+                                        <b>Full Name:</b> {{ profile.full_name|default:"Not specified" }}<br><br>
+                                        <b>Role:</b> {{ profile_user.role }}<br><br>
+                                        <b>Email:</b> {{ profile.email|default:profile_user.email }}<br><br>
+                                        <b>Department:</b> {{ profile.department|default:"Not specified" }}<br><br>
+                                        <b>Designation:</b> {{ profile.designation|default:"Not specified" }}<br><br>
+                                        <b>Phone Number:</b> {{ profile.phone_number|default:"Not specified" }}<br><br>
+                                    </font>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+
+                    <!-- Profile Edit Form (Only if authorized) -->
+                    <td width="65%">
+                        {% if can_edit %}
+                            <table width="100%" border="1" cellpadding="12" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#FFFFFF">
+                                <tr>
+                                    <td bgcolor="#EAEAEA">
+                                        <font face="Arial, Helvetica, sans-serif" size="4"><b>Update Profile Information</b></font>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <form method="post" enctype="multipart/form-data" action="{% url 'profile' username=profile_user.username %}">
+                                            {% csrf_token %}
+                                            <table width="100%" border="0" cellpadding="8" cellspacing="0">
+                                                {{ form.as_table }}
+                                                <tr>
+                                                    <td colspan="2" align="center">
+                                                        <br>
+                                                        <input type="submit" value="  Save Changes  ">
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </table>
+                        {% else %}
+                            <table width="100%" border="1" cellpadding="12" cellspacing="0" bordercolor="#FFCC00" bgcolor="#FFFDF0">
+                                <tr>
+                                    <td>
+                                        <font face="Arial, Helvetica, sans-serif" size="2" color="#666600">
+                                            You are viewing another user's profile. Edit capabilities are disabled.
+                                        </font>
+                                    </td>
+                                </tr>
+                            </table>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}

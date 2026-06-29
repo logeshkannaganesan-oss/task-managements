@@ -1,0 +1,39 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Delete Task - {{ task.title }}{% endblock %}
+
+{% block content %}
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+    <tr>
+        <td>
+            <font face="Arial, Helvetica, sans-serif" size="5" color="#CC0000"><b>Delete Task Confirmation</b></font>
+            <hr color="#CC0000">
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+            <br>
+            <table width="500" border="1" cellpadding="20" cellspacing="0" bordercolor="#CC0000" bgcolor="#FFF3F3">
+                <tr>
+                    <td>
+                        <font face="Arial, Helvetica, sans-serif" size="3">
+                            Are you sure you want to delete the task: <b>"{{ task.title }}"</b>?
+                            <br><br>
+                            This will also delete all comments posted on this task.
+                        </font>
+                        <br><br><br>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div align="center">
+                                <input type="submit" value="  Yes, Delete Task  ">
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="{% url 'task_detail' task_id=task.id %}"><button type="button">Cancel</button></a>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Register - Task Management System{% endblock %}
+
+{% block content %}
+<table align="center" width="550" border="1" cellpadding="15" cellspacing="0" bordercolor="#003366" bgcolor="#FFFFFF">
+    <tr>
+        <td align="center" bgcolor="#003366">
+            <font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">
+                <b>User Registration</b>
+            </font>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <font face="Arial, Helvetica, sans-serif" size="2" color="#666666">
+                Please complete all fields to sign up. After registering, your user profile will be created automatically.
+            </font>
+            <br><br>
+            <form method="post" action="{% url 'register' %}">
+                {% csrf_token %}
+                <table width="100%" border="0" cellpadding="8" cellspacing="0">
+                    {{ form.as_table }}
+                    <tr>
+                        <td colspan="2" align="center">
+                            <br>
+                            <input type="submit" value="  Register Account  ">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td align="center" bgcolor="#F0F0F0">
+            <font face="Arial, Helvetica, sans-serif" size="2">
+                Already have an account? <a href="{% url 'login' %}"><b>Login here</b></a>
+            </font>
+        </td>
+    </tr>
+</table>
+{% endblock %}

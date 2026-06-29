@@ -1,0 +1,39 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Delete Project - {{ project.name }}{% endblock %}
+
+{% block content %}
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+    <tr>
+        <td>
+            <font face="Arial, Helvetica, sans-serif" size="5" color="#CC0000"><b>Delete Project Confirmation</b></font>
+            <hr color="#CC0000">
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+            <br>
+            <table width="500" border="1" cellpadding="20" cellspacing="0" bordercolor="#CC0000" bgcolor="#FFF3F3">
+                <tr>
+                    <td>
+                        <font face="Arial, Helvetica, sans-serif" size="3">
+                            Are you sure you want to permanently delete the project: <b>"{{ project.name }}"</b>?
+                            <br><br>
+                            <font color="#CC0000"><b>Warning:</b> This action is irreversible. All tasks and comments associated with this project will be deleted.</font>
+                        </font>
+                        <br><br><br>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div align="center">
+                                <input type="submit" value="  Yes, Delete Project  ">
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="{% url 'project_detail' project_id=project.id %}"><button type="button">Cancel</button></a>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}

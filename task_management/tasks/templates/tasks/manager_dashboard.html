@@ -1,0 +1,166 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Manager Dashboard - Task Management System{% endblock %}
+
+{% block content %}
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+    <!-- Header -->
+    <tr>
+        <td>
+            <font face="Arial, Helvetica, sans-serif" size="5"><b>Manager Dashboard</b></font>
+            <hr color="#003366">
+        </td>
+    </tr>
+
+    <!-- Quick Actions -->
+    <tr>
+        <td bgcolor="#F9F9F9">
+            <font face="Arial, Helvetica, sans-serif" size="2">
+                <b>Quick Actions:</b> &nbsp;&nbsp;
+                <a href="{% url 'project_create' %}"><button type="button"><b>+ Create Project</b></button></a> &nbsp;&nbsp;
+                <a href="{% url 'task_create' %}"><button type="button"><b>+ Create Task</b></button></a>
+            </font>
+        </td>
+    </tr>
+
+    <!-- Main Workspace Section -->
+    <tr>
+        <td>
+            <table width="100%" border="0" cellpadding="10" cellspacing="0">
+                <tr valign="top">
+                    
+                    <!-- Left Column: Managed Projects & Pending Tasks -->
+                    <td width="70%">
+                        <!-- Managed Projects Table -->
+                        <font face="Arial, Helvetica, sans-serif" size="4"><b>My Managed Projects</b></font>
+                        <br><br>
+                        <table width="100%" border="1" cellpadding="8" cellspacing="0" bordercolor="#CCCCCC">
+                            <tr bgcolor="#EAEAEA">
+                                <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Project Name</font></th>
+                                <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Status</font></th>
+                                <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Due Date</font></th>
+                                <th align="center"><font face="Arial, Helvetica, sans-serif" size="2">Actions</font></th>
+                            </tr>
+                            {% for p in projects %}
+                            <tr>
+                                <td>
+                                    <font face="Arial, Helvetica, sans-serif" size="2">
+                                        <a href="{% url 'project_detail' project_id=p.id %}"><b>{{ p.name }}</b></a>
+                                    </font>
+                                </td>
+                                <td>
+                                    <font face="Arial, Helvetica, sans-serif" size="2">
+                                        <b>
+                                            {% if p.status == 'Planning' %}<font color="#666666">Planning</font>
+                                            {% elif p.status == 'Active' %}<font color="#008000">Active</font>
+                                            {% elif p.status == 'On Hold' %}<font color="#B8860B">On Hold</font>
+                                            {% elif p.status == 'Completed' %}<font color="#0000FF">Completed</font>
+                                            {% elif p.status == 'Cancelled' %}<font color="#FF0000">Cancelled</font>
+                                            {% endif %}
+                                        </b>
+                                    </font>
+                                </td>
+                                <td><font face="Arial, Helvetica, sans-serif" size="2">{{ p.end_date }}</font></td>
+                                <td align="center">
+                                    <font face="Arial, Helvetica, sans-serif" size="2">
+                                        <a href="{% url 'project_edit' project_id=p.id %}">Edit</a> | 
+                                        <a href="{% url 'project_delete' project_id=p.id %}"><font color="#CC0000">Delete</font></a>
+                                    </font>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" align="center">
+                                    <font face="Arial, Helvetica, sans-serif" size="2">No projects assigned or created.</font>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+
+                        <br><br><br>
+
+                        <!-- Pending Tasks Table -->
+                        <font face="Arial, Helvetica, sans-serif" size="4"><b>Pending Project Tasks</b></font>
+                        <br><br>
+                        <table width="100%" border="1" cellpadding="8" cellspacing="0" bordercolor="#CCCCCC">
+                            <tr bgcolor="#EAEAEA">
+                                <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Task Title</font></th>
+                                <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Project</font></th>
+                                <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Assignee</font></th>
+                                <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Priority</font></th>
+                                <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Status</font></th>
+                            </tr>
+                            {% for t in pending_tasks %}
+                            <tr>
+                                <td>
+                                    <font face="Arial, Helvetica, sans-serif" size="2">
+                                        <a href="{% url 'task_detail' task_id=t.id %}"><b>{{ t.title }}</b></a>
+                                    </font>
+                                </td>
+                                <td><font face="Arial, Helvetica, sans-serif" size="2">{{ t.project.name }}</font></td>
+                                <td>
+                                    <font face="Arial, Helvetica, sans-serif" size="2">
+                                        {% if t.assigned_user %}
+                                            <a href="{% url 'profile' username=t.assigned_user.username %}">{{ t.assigned_user.username }}</a>
+                                        {% else %}
+                                            <font color="#999999">Unassigned</font>
+                                        {% endif %}
+                                    </font>
+                                </td>
+                                <td>
+                                    <font face="Arial, Helvetica, sans-serif" size="2">
+                                        {% if t.priority == 'Critical' %}<font color="#CC0000"><b>Critical</b></font>
+                                        {% elif t.priority == 'High' %}<font color="#FF6600">High</font>
+                                        {% elif t.priority == 'Medium' %}<font color="#000099">Medium</font>
+                                        {% else %}<font color="#666666">Low</font>
+                                        {% endif %}
+                                    </font>
+                                </td>
+                                <td>
+                                    <font face="Arial, Helvetica, sans-serif" size="2">
+                                        <b>{{ t.status }}</b>
+                                    </font>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" align="center">
+                                    <font face="Arial, Helvetica, sans-serif" size="2">No pending tasks for your projects.</font>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+
+                    <!-- Right Column: Team Members Directory -->
+                    <td width="30%" bgcolor="#F9F9F9">
+                        <font face="Arial, Helvetica, sans-serif" size="4"><b>Team Members</b></font>
+                        <br><br>
+                        <table width="100%" border="0" cellpadding="8" cellspacing="0">
+                            {% for m in team_members %}
+                            <tr border="1">
+                                <td bgcolor="#FFFFFF" style="border: 1px solid #DDDDDD;">
+                                    <font face="Arial, Helvetica, sans-serif" size="2">
+                                        <a href="{% url 'profile' username=m.username %}"><b>{{ m.profile.full_name|default:m.username }}</b></a><br>
+                                        <font color="#666666">{{ m.profile.designation|default:"Team Member" }}</font><br>
+                                        <font size="1" color="#888888">{{ m.profile.department|default:"No Department" }}</font>
+                                    </font>
+                                </td>
+                            </tr>
+                            <tr><td></td></tr>
+                            {% empty %}
+                            <tr>
+                                <td>
+                                    <font face="Arial, Helvetica, sans-serif" size="2">No team members registered yet.</font>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}

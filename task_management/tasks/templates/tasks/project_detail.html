@@ -1,0 +1,193 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Project Details - {{ project.name }}{% endblock %}
+
+{% block content %}
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+    <!-- Breadcrumb / Header -->
+    <tr>
+        <td colspan="2">
+            <font face="Arial, Helvetica, sans-serif" size="2">
+                <a href="{% url 'index' %}">Dashboard</a> &gt; Project Details
+            </font>
+            <br><br>
+            <font face="Arial, Helvetica, sans-serif" size="5"><b>Project: {{ project.name }}</b></font>
+            {% if user.role == 'Admin' or project.created_by == user %}
+                <font face="Arial, Helvetica, sans-serif" size="2">
+                    &nbsp;&nbsp;[<a href="{% url 'project_edit' project_id=project.id %}">Edit Project</a>]
+                    &nbsp;&nbsp;[<a href="{% url 'project_delete' project_id=project.id %}"><font color="#CC0000">Delete Project</font></a>]
+                </font>
+            {% endif %}
+            <hr color="#003366">
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <!-- Left Side: Metadata & Tasks -->
+        <td width="70%">
+            <!-- Project Info -->
+            <table width="100%" border="1" cellpadding="10" cellspacing="0" bordercolor="#DDDDDD" bgcolor="#FFFFFF">
+                <tr>
+                    <td width="30%" bgcolor="#F9F9F9"><b><font size="2" face="Arial">Status</font></b></td>
+                    <td>
+                        <font size="2" face="Arial">
+                            <b>
+                                {% if project.status == 'Planning' %}<font color="#666666">Planning</font>
+                                {% elif project.status == 'Active' %}<font color="#008000">Active</font>
+                                {% elif project.status == 'On Hold' %}<font color="#B8860B">On Hold</font>
+                                {% elif project.status == 'Completed' %}<font color="#0000FF">Completed</font>
+                                {% elif project.status == 'Cancelled' %}<font color="#FF0000">Cancelled</font>
+                                {% endif %}
+                            </b>
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td bgcolor="#F9F9F9"><b><font size="2" face="Arial">Start / End Date</font></b></td>
+                    <td><font size="2" face="Arial">{{ project.start_date }} to {{ project.end_date }}</font></td>
+                </tr>
+                <tr>
+                    <td bgcolor="#F9F9F9"><b><font size="2" face="Arial">Created By</font></b></td>
+                    <td><font size="2" face="Arial"><a href="{% url 'profile' username=project.created_by.username %}">{{ project.created_by.username }}</a></font></td>
+                </tr>
+                <tr>
+                    <td bgcolor="#F9F9F9"><b><font size="2" face="Arial">Description</font></b></td>
+                    <td><font size="2" face="Arial">{{ project.description|linebreaksbr }}</font></td>
+                </tr>
+            </table>
+
+            <br><br><br>
+
+            <!-- Project Tasks -->
+            <table width="100%" border="0" cellpadding="5" cellspacing="0">
+                <tr>
+                    <td><font face="Arial, Helvetica, sans-serif" size="4"><b>Project Tasks</b></font></td>
+                    <td align="right">
+                        {% if user.role == 'Admin' or project.created_by == user %}
+                            <a href="{% url 'task_create_in_project' project_id=project.id %}">
+                                <button type="button"><b>+ Add Task</b></button>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+            <br>
+
+            <table width="100%" border="1" cellpadding="8" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#FFFFFF">
+                <tr bgcolor="#EAEAEA">
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Task Title</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Assignee</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Priority</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Status</font></th>
+                    {% if user.role == 'Admin' or project.created_by == user %}
+                        <th align="center"><font face="Arial, Helvetica, sans-serif" size="2">Actions</font></th>
+                    {% endif %}
+                </tr>
+                {% for t in tasks %}
+                <tr>
+                    <td>
+                        <font face="Arial, Helvetica, sans-serif" size="2">
+                            <a href="{% url 'task_detail' task_id=t.id %}"><b>{{ t.title }}</b></a>
+                        </font>
+                    </td>
+                    <td>
+                        <font face="Arial, Helvetica, sans-serif" size="2">
+                            {% if t.assigned_user %}
+                                <a href="{% url 'profile' username=t.assigned_user.username %}">{{ t.assigned_user.username }}</a>
+                            {% else %}
+                                <font color="#999999">Unassigned</font>
+                            {% endif %}
+                        </font>
+                    </td>
+                    <td>
+                        <font face="Arial, Helvetica, sans-serif" size="2">
+                            {% if t.priority == 'Critical' %}<font color="#CC0000"><b>Critical</b></font>
+                            {% elif t.priority == 'High' %}<font color="#FF6600">High</font>
+                            {% elif t.priority == 'Medium' %}<font color="#000099">Medium</font>
+                            {% else %}<font color="#666666">Low</font>
+                            {% endif %}
+                        </font>
+                    </td>
+                    <td>
+                        <font face="Arial, Helvetica, sans-serif" size="2"><b>{{ t.status }}</b></font>
+                    </td>
+                    {% if user.role == 'Admin' or project.created_by == user %}
+                    <td align="center">
+                        <font face="Arial, Helvetica, sans-serif" size="2">
+                            <a href="{% url 'task_edit' task_id=t.id %}">Edit</a> | 
+                            <a href="{% url 'task_delete' task_id=t.id %}" onclick="return confirm('Are you sure you want to delete this task?')"><font color="#CC0000">Delete</font></a>
+                        </font>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if user.role == 'Admin' or project.created_by == user %}5{% else %}4{% endif %}" align="center">
+                        <font face="Arial, Helvetica, sans-serif" size="2">No tasks created for this project yet.</font>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td>
+
+        <!-- Right Side: Members & Attachments -->
+        <td width="30%">
+            <!-- Project Members -->
+            <table width="100%" border="1" cellpadding="10" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#F9F9F9">
+                <tr bgcolor="#EAEAEA">
+                    <td><b><font size="3" face="Arial">Project Members</font></b></td>
+                </tr>
+                <tr>
+                    <td>
+                        <font size="2" face="Arial">
+                            <b>Manager:</b> <a href="{% url 'profile' username=project.created_by.username %}">{{ project.created_by.username }}</a>
+                            <br><br>
+                            <b>Assigned Team Members:</b>
+                            <ul>
+                                {% for m in project.members.all %}
+                                    <li><a href="{% url 'profile' username=m.username %}">{{ m.profile.full_name|default:m.username }}</a></li>
+                                {% empty %}
+                                    <li><font color="#999999">No team members assigned.</font></li>
+                                {% endfor %}
+                            </ul>
+                        </font>
+                    </td>
+                </tr>
+            </table>
+
+            <br><br>
+
+            <!-- Attachments -->
+            <table width="100%" border="1" cellpadding="10" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#F9F9F9">
+                <tr bgcolor="#EAEAEA">
+                    <td><b><font size="3" face="Arial">Project Files</font></b></td>
+                </tr>
+                <tr>
+                    <td>
+                        {% for a in attachments %}
+                            <font size="2" face="Arial">
+                                &#128196; <a href="{{ a.file.url }}" target="_blank">{{ a.file.name|slice:"12:" }}</a><br>
+                                <font size="1" color="#666666">Uploaded by {{ a.uploaded_by.username }} on {{ a.uploaded_at|date:"Y-m-d" }}</font>
+                            </font>
+                            <hr color="#EAEAEA">
+                        {% empty %}
+                            <font size="2" face="Arial" color="#999999">No files uploaded.</font>
+                            <hr color="#EAEAEA">
+                        {% endfor %}
+                        
+                        <!-- File Upload Form -->
+                        <form method="post" enctype="multipart/form-data" action="{% url 'upload_attachment' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="project_id" value="{{ project.id }}">
+                            <font size="2" face="Arial"><b>Upload File:</b></font><br>
+                            {{ attachment_form.file }}
+                            <br><br>
+                            <input type="submit" value="Upload">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}

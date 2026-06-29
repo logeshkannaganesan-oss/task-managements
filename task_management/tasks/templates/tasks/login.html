@@ -1,0 +1,53 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Login - Task Management System{% endblock %}
+
+{% block content %}
+<table align="center" width="450" border="1" cellpadding="15" cellspacing="0" bordercolor="#003366" bgcolor="#FFFFFF">
+    <tr>
+        <td align="center" bgcolor="#003366">
+            <font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">
+                <b>Login to Task Management System</b>
+            </font>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <table width="100%" border="0" cellpadding="8" cellspacing="0">
+                    <tr>
+                        <td width="30%">
+                            <font face="Arial, Helvetica, sans-serif" size="2"><b>Username:</b></font>
+                        </td>
+                        <td>
+                            <input type="text" name="username" required size="30">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <font face="Arial, Helvetica, sans-serif" size="2"><b>Password:</b></font>
+                        </td>
+                        <td>
+                            <input type="password" name="password" required size="30">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center">
+                            <br>
+                            <input type="submit" value="  Login  ">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td align="center" bgcolor="#F0F0F0">
+            <font face="Arial, Helvetica, sans-serif" size="2">
+                New user? <a href="{% url 'register' %}"><b>Register a new account</b></a>
+            </font>
+        </td>
+    </tr>
+</table>
+{% endblock %}

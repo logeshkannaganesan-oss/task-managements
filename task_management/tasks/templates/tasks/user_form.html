@@ -1,0 +1,103 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}{{ action }} User - Task Management System{% endblock %}
+
+{% block content %}
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+    <tr>
+        <td>
+            <font face="Arial, Helvetica, sans-serif" size="2">
+                <a href="{% url 'index' %}">Dashboard</a> &gt; {{ action }} User
+            </font>
+            <br><br>
+            <font face="Arial, Helvetica, sans-serif" size="5"><b>{{ action }} User</b></font>
+            <hr color="#003366">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table align="center" width="600" border="1" cellpadding="15" cellspacing="0" bordercolor="#003366" bgcolor="#FFFFFF">
+                <tr>
+                    <td bgcolor="#003366">
+                        <font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">
+                            <b>User Profile Fields</b>
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <table width="100%" border="0" cellpadding="8" cellspacing="0">
+                                {% if action == 'Create' %}
+                                    {{ form.as_table }}
+                                {% else %}
+                                    <!-- Custom render to show and edit User and Profile details simultaneously -->
+                                    <tr>
+                                        <td><font face="Arial, Helvetica, sans-serif" size="2"><b>Username:</b></font></td>
+                                        <td><input type="text" name="username" value="{{ edit_user.username }}" required size="30"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><font face="Arial, Helvetica, sans-serif" size="2"><b>First Name:</b></font></td>
+                                        <td><input type="text" name="first_name" value="{{ edit_user.first_name }}" size="30"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><font face="Arial, Helvetica, sans-serif" size="2"><b>Last Name:</b></font></td>
+                                        <td><input type="text" name="last_name" value="{{ edit_user.last_name }}" size="30"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><font face="Arial, Helvetica, sans-serif" size="2"><b>Email:</b></font></td>
+                                        <td><input type="email" name="email" value="{{ edit_user.email }}" size="30"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><font face="Arial, Helvetica, sans-serif" size="2"><b>Role:</b></font></td>
+                                        <td>
+                                            <select name="role">
+                                                <option value="Admin" {% if edit_user.role == 'Admin' %}selected{% endif %}>Admin</option>
+                                                <option value="Project Manager" {% if edit_user.role == 'Project Manager' %}selected{% endif %}>Project Manager</option>
+                                                <option value="Team Member" {% if edit_user.role == 'Team Member' %}selected{% endif %}>Team Member</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2"><hr color="#EAEAEA"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><font face="Arial, Helvetica, sans-serif" size="2"><b>Department:</b></font></td>
+                                        <td><input type="text" name="department" value="{{ profile.department }}" size="30"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><font face="Arial, Helvetica, sans-serif" size="2"><b>Designation:</b></font></td>
+                                        <td><input type="text" name="designation" value="{{ profile.designation }}" size="30"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><font face="Arial, Helvetica, sans-serif" size="2"><b>Phone Number:</b></font></td>
+                                        <td><input type="text" name="phone_number" value="{{ profile.phone_number }}" size="30"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><font face="Arial, Helvetica, sans-serif" size="2"><b>Profile Image:</b></font></td>
+                                        <td>
+                                            {% if profile.profile_image %}
+                                                <img src="{{ profile.profile_image.url }}" width="80" border="1"><br>
+                                            {% endif %}
+                                            <input type="file" name="profile_image">
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                <tr>
+                                    <td colspan="2" align="center">
+                                        <br>
+                                        <input type="submit" value="  Save User  ">
+                                        &nbsp;&nbsp;
+                                        <a href="{% url 'admin_dashboard' %}"><button type="button">Cancel</button></a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}

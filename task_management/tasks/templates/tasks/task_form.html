@@ -1,0 +1,64 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}{{ action }} Task - Task Management System{% endblock %}
+
+{% block content %}
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+    <tr>
+        <td>
+            <font face="Arial, Helvetica, sans-serif" size="2">
+                <a href="{% url 'index' %}">Dashboard</a> &gt; 
+                {% if task %}
+                    <a href="{% url 'task_detail' task_id=task.id %}">{{ task.title }}</a> &gt; 
+                {% endif %}
+                {{ action }} Task
+            </font>
+            <br><br>
+            <font face="Arial, Helvetica, sans-serif" size="5"><b>{{ action }} Task</b></font>
+            <hr color="#003366">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table align="center" width="600" border="1" cellpadding="15" cellspacing="0" bordercolor="#003366" bgcolor="#FFFFFF">
+                <tr>
+                    <td bgcolor="#003366">
+                        <font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">
+                            <b>{% if status_only %}Update Task Status{% else %}Task Details{% endif %}</b>
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <form method="post">
+                            {% csrf_token %}
+                            <table width="100%" border="0" cellpadding="8" cellspacing="0">
+                                {% if status_only %}
+                                    <tr>
+                                        <td><font face="Arial, Helvetica, sans-serif" size="2"><b>Status:</b></font></td>
+                                        <td>{{ form.status }}</td>
+                                    </tr>
+                                {% else %}
+                                    {{ form.as_table }}
+                                {% endif %}
+                                <tr>
+                                    <td colspan="2" align="center">
+                                        <br>
+                                        <input type="submit" value="  Save Task  ">
+                                        &nbsp;&nbsp;
+                                        {% if task %}
+                                            <a href="{% url 'task_detail' task_id=task.id %}"><button type="button">Cancel</button></a>
+                                        {% else %}
+                                            <a href="{% url 'index' %}"><button type="button">Cancel</button></a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}

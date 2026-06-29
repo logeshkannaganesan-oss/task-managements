@@ -1,0 +1,225 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Task Details - {{ task.title }}{% endblock %}
+
+{% block content %}
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+    <!-- Breadcrumb / Header -->
+    <tr>
+        <td colspan="2">
+            <font face="Arial, Helvetica, sans-serif" size="2">
+                <a href="{% url 'index' %}">Dashboard</a> &gt; 
+                <a href="{% url 'project_detail' project_id=task.project.id %}">{{ task.project.name }}</a> &gt; 
+                Task Details
+            </font>
+            <br><br>
+            <font face="Arial, Helvetica, sans-serif" size="5"><b>Task: {{ task.title }}</b></font>
+            {% if user.role == 'Admin' or task.project.created_by == user %}
+                <font face="Arial, Helvetica, sans-serif" size="2">
+                    &nbsp;&nbsp;[<a href="{% url 'task_edit' task_id=task.id %}">Edit Task</a>]
+                    &nbsp;&nbsp;[<a href="{% url 'task_delete' task_id=task.id %}"><font color="#CC0000">Delete Task</font></a>]
+                </font>
+            {% endif %}
+            <hr color="#003366">
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <!-- Left Side: Task Info & Comments -->
+        <td width="65%">
+            <!-- Task Info Table -->
+            <table width="100%" border="1" cellpadding="10" cellspacing="0" bordercolor="#DDDDDD" bgcolor="#FFFFFF">
+                <tr>
+                    <td width="30%" bgcolor="#F9F9F9"><b><font size="2" face="Arial">Project</font></b></td>
+                    <td><font size="2" face="Arial"><a href="{% url 'project_detail' project_id=task.project.id %}">{{ task.project.name }}</a></font></td>
+                </tr>
+                <tr>
+                    <td bgcolor="#F9F9F9"><b><font size="2" face="Arial">Status</font></b></td>
+                    <td>
+                        <font size="2" face="Arial">
+                            <b>
+                                {% if task.status == 'To Do' %}<font color="#666666">To Do</font>
+                                {% elif task.status == 'In Progress' %}<font color="#0000FF">In Progress</font>
+                                {% elif task.status == 'Review' %}<font color="#B8860B">Review</font>
+                                {% elif task.status == 'Done' %}<font color="#008000">Done</font>
+                                {% elif task.status == 'Blocked' %}<font color="#FF0000">Blocked</font>
+                                {% endif %}
+                            </b>
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td bgcolor="#F9F9F9"><b><font size="2" face="Arial">Priority</font></b></td>
+                    <td>
+                        <font size="2" face="Arial">
+                            {% if task.priority == 'Critical' %}<font color="#CC0000"><b>Critical</b></font>
+                            {% elif task.priority == 'High' %}<font color="#FF6600">High</font>
+                            {% elif task.priority == 'Medium' %}<font color="#000099">Medium</font>
+                            {% else %}<font color="#666666">Low</font>
+                            {% endif %}
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td bgcolor="#F9F9F9"><b><font size="2" face="Arial">Assignee</font></b></td>
+                    <td>
+                        <font size="2" face="Arial">
+                            {% if task.assigned_user %}
+                                <a href="{% url 'profile' username=task.assigned_user.username %}">{{ task.assigned_user.profile.full_name|default:task.assigned_user.username }}</a>
+                            {% else %}
+                                <font color="#999999">Unassigned</font>
+                            {% endif %}
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td bgcolor="#F9F9F9"><b><font size="2" face="Arial">Timeline</font></b></td>
+                    <td><font size="2" face="Arial">Start Date: {{ task.start_date }} &nbsp;|&nbsp; Due Date: <b>{{ task.due_date }}</b></font></td>
+                </tr>
+                <tr>
+                    <td bgcolor="#F9F9F9"><b><font size="2" face="Arial">Description</font></b></td>
+                    <td><font size="2" face="Arial">{{ task.description|linebreaksbr }}</font></td>
+                </tr>
+            </table>
+
+            <!-- Quick Status Form (For Assignee) -->
+            {% if task.assigned_user == user and user.role == 'Team Member' %}
+                <br>
+                <table width="100%" border="1" cellpadding="10" cellspacing="0" bordercolor="#FFCC00" bgcolor="#FFFDF0">
+                    <tr>
+                        <td>
+                            <form method="post" action="{% url 'task_edit' task_id=task.id %}">
+                                {% csrf_token %}
+                                <font size="2" face="Arial"><b>Update Task Status:</b></font> &nbsp;
+                                {{ status_form.status }} &nbsp;
+                                <input type="submit" value="Update">
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+            {% endif %}
+
+            <br><br><br>
+
+            <!-- Comments Section -->
+            <font face="Arial, Helvetica, sans-serif" size="4"><b>Comments and Discussion</b></font>
+            <br><br>
+
+            <!-- Post Main Comment -->
+            <table width="100%" border="1" cellpadding="10" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#F9F9F9">
+                <tr>
+                    <td>
+                        <form method="post" action="{% url 'add_comment' task_id=task.id %}">
+                            {% csrf_token %}
+                            <font size="2" face="Arial"><b>Add a new comment:</b></font><br><br>
+                            {{ comment_form.content }}
+                            <br><br>
+                            <input type="submit" value="  Post Comment  ">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+            
+            <br><br>
+
+            <!-- Comments List -->
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                {% for c in comments %}
+                <tr>
+                    <td>
+                        <table width="100%" border="1" cellpadding="10" cellspacing="0" bordercolor="#EAEAEA" bgcolor="#FFFFFF">
+                            <tr>
+                                <td bgcolor="#F5F5F5">
+                                    <font size="2" face="Arial">
+                                        <b><a href="{% url 'profile' username=c.author.username %}">{{ c.author.username }}</a></b> 
+                                        <font color="#888888">on {{ c.created_at }}</font>
+                                    </font>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <font size="2" face="Arial">{{ c.content|linebreaksbr }}</font>
+                                    
+                                    <!-- Inline Reply Form -->
+                                    <br><br>
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td>
+                                                <form method="post" action="{% url 'add_comment' task_id=task.id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="parent_id" value="{{ c.id }}">
+                                                    <input type="text" name="content" required size="45" placeholder="Reply to this comment...">
+                                                    <input type="submit" value="Reply">
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- Nested Replies -->
+                                    {% if c.replies.all %}
+                                        <br>
+                                        <table width="95%" align="right" border="0" cellpadding="5" cellspacing="5">
+                                            {% for reply in c.replies.all %}
+                                            <tr>
+                                                <td bgcolor="#FAFAFA" border="1" style="border: 1px solid #EEEEEE; padding: 8px;">
+                                                    <font size="2" face="Arial">
+                                                        <b><a href="{% url 'profile' username=reply.author.username %}">{{ reply.author.username }}</a></b>
+                                                        <font color="#888888">replied on {{ reply.created_at }}</font><br>
+                                                        {{ reply.content|linebreaksbr }}
+                                                    </font>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </table>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                        <br>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td align="center">
+                        <font size="2" face="Arial" color="#999999">No comments yet. Start the conversation!</font>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td>
+
+        <!-- Right Side: Attachments -->
+        <td width="35%">
+            <table width="100%" border="1" cellpadding="10" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#F9F9F9">
+                <tr bgcolor="#EAEAEA">
+                    <td><b><font size="3" face="Arial">Task Attachments</font></b></td>
+                </tr>
+                <tr>
+                    <td>
+                        {% for a in attachments %}
+                            <font size="2" face="Arial">
+                                &#128196; <a href="{{ a.file.url }}" target="_blank">{{ a.file.name|slice:"12:" }}</a><br>
+                                <font size="1" color="#666666">Uploaded by {{ a.uploaded_by.username }} on {{ a.uploaded_at|date:"Y-m-d" }}</font>
+                            </font>
+                            <hr color="#EAEAEA">
+                        {% empty %}
+                            <font size="2" face="Arial" color="#999999">No files uploaded for this task.</font>
+                            <hr color="#EAEAEA">
+                        {% endfor %}
+                        
+                        <!-- Attachment Form -->
+                        <form method="post" enctype="multipart/form-data" action="{% url 'upload_attachment' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="task_id" value="{{ task.id }}">
+                            <font size="2" face="Arial"><b>Upload File:</b></font><br>
+                            {{ attachment_form.file }}
+                            <br><br>
+                            <input type="submit" value="Upload to Task">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}

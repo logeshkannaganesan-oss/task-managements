@@ -1,0 +1,184 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Search & Filter - Task Management System{% endblock %}
+
+{% block content %}
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+    <!-- Header -->
+    <tr>
+        <td>
+            <font face="Arial, Helvetica, sans-serif" size="5"><b>Search & Filter Center</b></font>
+            <hr color="#003366">
+        </td>
+    </tr>
+
+    <!-- Search Form -->
+    <tr>
+        <td>
+            <table width="100%" border="1" cellpadding="15" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#F9F9F9">
+                <tr>
+                    <td>
+                        <form method="get" action="{% url 'search' %}">
+                            <table width="100%" border="0" cellpadding="8" cellspacing="0">
+                                <tr>
+                                    <!-- Text Search -->
+                                    <td width="40%">
+                                        <font face="Arial, Helvetica, sans-serif" size="2"><b>Search Term (Name/Title/Desc):</b></font><br>
+                                        <input type="text" name="q" value="{{ q }}" placeholder="Type keywords..." size="40">
+                                    </td>
+                                    
+                                    <!-- Status Filter -->
+                                    <td width="20%">
+                                        <font face="Arial, Helvetica, sans-serif" size="2"><b>Status:</b></font><br>
+                                        <select name="status">
+                                            <option value="">-- All Statuses --</option>
+                                            <option value="Planning" {% if status_filter == 'Planning' %}selected{% endif %}>Planning (Project)</option>
+                                            <option value="Active" {% if status_filter == 'Active' %}selected{% endif %}>Active (Project)</option>
+                                            <option value="On Hold" {% if status_filter == 'On Hold' %}selected{% endif %}>On Hold (Project)</option>
+                                            <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed (Project)</option>
+                                            <option value="Cancelled" {% if status_filter == 'Cancelled' %}selected{% endif %}>Cancelled (Project)</option>
+                                            <option value="To Do" {% if status_filter == 'To Do' %}selected{% endif %}>To Do (Task)</option>
+                                            <option value="In Progress" {% if status_filter == 'In Progress' %}selected{% endif %}>In Progress (Task)</option>
+                                            <option value="Review" {% if status_filter == 'Review' %}selected{% endif %}>Review (Task)</option>
+                                            <option value="Done" {% if status_filter == 'Done' %}selected{% endif %}>Done (Task)</option>
+                                            <option value="Blocked" {% if status_filter == 'Blocked' %}selected{% endif %}>Blocked (Task)</option>
+                                        </select>
+                                    </td>
+
+                                    <!-- Priority Filter -->
+                                    <td width="20%">
+                                        <font face="Arial, Helvetica, sans-serif" size="2"><b>Priority (Task):</b></font><br>
+                                        <select name="priority">
+                                            <option value="">-- All Priorities --</option>
+                                            {% for key, val in priority_choices %}
+                                                <option value="{{ key }}" {% if priority_filter == key %}selected{% endif %}>{{ val }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+
+                                    <!-- Assignee Filter -->
+                                    <td width="20%">
+                                        <font face="Arial, Helvetica, sans-serif" size="2"><b>Assignee:</b></font><br>
+                                        <select name="assignee">
+                                            <option value="">-- All Users --</option>
+                                            {% for u in all_users %}
+                                                <option value="{{ u.id }}" {% if assignee_filter == u.id|stringformat:"i" %}selected{% endif %}>{{ u.username }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" align="center">
+                                        <br>
+                                        <input type="submit" value="  Apply Filters & Search  ">
+                                        &nbsp;&nbsp;
+                                        <a href="{% url 'search' %}"><button type="button">Reset</button></a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Results Section -->
+    <tr>
+        <td>
+            <br>
+            <!-- Matching Projects -->
+            <font face="Arial, Helvetica, sans-serif" size="4"><b>Matching Projects ({{ projects.count }})</b></font>
+            <br><br>
+            <table width="100%" border="1" cellpadding="8" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#FFFFFF">
+                <tr bgcolor="#EAEAEA">
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Project Name</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Status</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Start Date</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">End Date</font></th>
+                </tr>
+                {% for p in projects %}
+                <tr>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2"><a href="{% url 'project_detail' project_id=p.id %}"><b>{{ p.name }}</b></a></font></td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2"><b>{{ p.status }}</b></font></td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2">{{ p.start_date }}</font></td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2">{{ p.end_date }}</font></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" align="center">
+                        <font face="Arial, Helvetica, sans-serif" size="2">No projects match the criteria.</font>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            <br><br><br>
+
+            <!-- Matching Tasks -->
+            <font face="Arial, Helvetica, sans-serif" size="4"><b>Matching Tasks ({{ tasks.count }})</b></font>
+            <br><br>
+            <table width="100%" border="1" cellpadding="8" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#FFFFFF">
+                <tr bgcolor="#EAEAEA">
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Task Title</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Project</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Assignee</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Priority</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Status</font></th>
+                </tr>
+                {% for t in tasks %}
+                <tr>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2"><a href="{% url 'task_detail' task_id=t.id %}"><b>{{ t.title }}</b></a></font></td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2">{{ t.project.name }}</font></td>
+                    <td>
+                        <font face="Arial, Helvetica, sans-serif" size="2">
+                            {% if t.assigned_user %}
+                                {{ t.assigned_user.username }}
+                            {% else %}
+                                <font color="#999999">Unassigned</font>
+                            {% endif %}
+                        </font>
+                    </td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2">{{ t.priority }}</font></td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2"><b>{{ t.status }}</b></font></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" align="center">
+                        <font face="Arial, Helvetica, sans-serif" size="2">No tasks match the criteria.</font>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            <br><br><br>
+
+            <!-- Matching Users -->
+            <font face="Arial, Helvetica, sans-serif" size="4"><b>Matching Users ({{ users.count }})</b></font>
+            <br><br>
+            <table width="100%" border="1" cellpadding="8" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#FFFFFF">
+                <tr bgcolor="#EAEAEA">
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Username</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Full Name</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Department</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Designation</font></th>
+                </tr>
+                {% for u in users %}
+                <tr>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2"><a href="{% url 'profile' username=u.username %}"><b>{{ u.username }}</b></a></font></td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2">{{ u.profile.full_name }}</font></td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2">{{ u.profile.department }}</font></td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2">{{ u.profile.designation }}</font></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" align="center">
+                        <font face="Arial, Helvetica, sans-serif" size="2">No users match the criteria.</font>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}

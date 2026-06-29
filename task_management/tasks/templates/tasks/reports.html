@@ -1,0 +1,154 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}System Reports - Task Management System{% endblock %}
+
+{% block content %}
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+    <!-- Header -->
+    <tr>
+        <td>
+            <font face="Arial, Helvetica, sans-serif" size="5"><b>System Reports Dashboard</b></font>
+            <hr color="#003366">
+        </td>
+    </tr>
+
+    <!-- Project Completion Report Section -->
+    <tr>
+        <td>
+            <font face="Arial, Helvetica, sans-serif" size="4"><b>1. Project Completion Report</b></font>
+            <br><br>
+            
+            <table width="100%" border="1" cellpadding="10" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#FFFFFF">
+                <tr bgcolor="#F9F9F9">
+                    <td width="40%"><b><font size="2" face="Arial">Total Registered Projects:</font></b></td>
+                    <td><font size="2" face="Arial">{{ project_count }}</font></td>
+                </tr>
+                <tr bgcolor="#F9F9F9">
+                    <td><b><font size="2" face="Arial">Completed Projects:</font></b></td>
+                    <td><font size="2" face="Arial">{{ completed_projects_count }}</font></td>
+                </tr>
+                <tr bgcolor="#F9F9F9">
+                    <td><b><font size="2" face="Arial">Overall Completion Rate:</font></b></td>
+                    <td>
+                        <font size="2" face="Arial" color="#008000"><b>{{ project_completion_rate }}%</b></font>
+                        <br><br>
+                        <!-- Visual Progress Bar using a simple HTML table -->
+                        <table width="100%" height="20" border="1" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#EAEAEA">
+                            <tr>
+                                {% if project_completion_rate > 0 %}
+                                    <td width="{{ project_completion_rate }}%" bgcolor="#008000" align="center">
+                                        <font color="#FFFFFF" size="1" face="Arial"><b>{{ project_completion_rate }}%</b></font>
+                                    </td>
+                                {% endif %}
+                                {% if project_completion_rate < 100 %}
+                                    <td width="{{ remaining_completion_rate }}%"></td>
+                                {% endif %}
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <br><br>
+
+            <table width="100%" border="1" cellpadding="8" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#FFFFFF">
+                <tr bgcolor="#EAEAEA">
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Project Name</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Manager</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Timeline</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Status</font></th>
+                </tr>
+                {% for p in all_projects %}
+                <tr>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2"><a href="{% url 'project_detail' project_id=p.id %}"><b>{{ p.name }}</b></a></font></td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2">{{ p.created_by.username }}</font></td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2">{{ p.start_date }} to {{ p.end_date }}</font></td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2"><b>{{ p.status }}</b></font></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+
+    <!-- Task Status Distribution Section -->
+    <tr>
+        <td>
+            <br><br><br>
+            <font face="Arial, Helvetica, sans-serif" size="4"><b>2. Task Status Report</b></font>
+            <br><br>
+
+            <table width="100%" border="1" cellpadding="10" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#FFFFFF">
+                <tr bgcolor="#EAEAEA">
+                    <th align="left" width="25%"><font face="Arial, Helvetica, sans-serif" size="2">Task Status</font></th>
+                    <th align="left" width="15%"><font face="Arial, Helvetica, sans-serif" size="2">Total Count</font></th>
+                    <th align="left" width="60%"><font face="Arial, Helvetica, sans-serif" size="2">Visual Distribution</font></th>
+                </tr>
+                {% for stat in task_status_data %}
+                <tr>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2"><b>{{ stat.status }}</b></font></td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2">{{ stat.count }}</font></td>
+                    <td>
+                        <!-- Simple visual distribution bar using colored HTML cells -->
+                        <table width="100%" height="15" border="0" cellpadding="0" cellspacing="0" bgcolor="#EAEAEA">
+                            <tr>
+                                <!-- Simulating dynamic width using standard cells -->
+                                <td width="{% widthratio stat.count 50 100 %}%" bgcolor="#003366">&nbsp;</td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" align="center">
+                        <font face="Arial, Helvetica, sans-serif" size="2">No tasks recorded in the system.</font>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+
+    <!-- User Productivity Report Section -->
+    <tr>
+        <td>
+            <br><br><br>
+            <font face="Arial, Helvetica, sans-serif" size="4"><b>3. User Productivity Report</b></font>
+            <br><br>
+
+            <table width="100%" border="1" cellpadding="8" cellspacing="0" bordercolor="#CCCCCC" bgcolor="#FFFFFF">
+                <tr bgcolor="#EAEAEA">
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Username</font></th>
+                    <th align="left"><font face="Arial, Helvetica, sans-serif" size="2">Role</font></th>
+                    <th align="center"><font face="Arial, Helvetica, sans-serif" size="2">Tasks Assigned</font></th>
+                    <th align="center"><font face="Arial, Helvetica, sans-serif" size="2">Tasks Completed (Done)</font></th>
+                    <th align="center"><font face="Arial, Helvetica, sans-serif" size="2">Comments Posted</font></th>
+                </tr>
+                {% for u in users_data %}
+                <tr>
+                    <td>
+                        <font face="Arial, Helvetica, sans-serif" size="2">
+                            <a href="{% url 'profile' username=u.username %}"><b>{{ u.username }}</b></a>
+                        </font>
+                    </td>
+                    <td><font face="Arial, Helvetica, sans-serif" size="2">{{ u.role }}</font></td>
+                    <td align="center"><font face="Arial, Helvetica, sans-serif" size="2">{{ u.assigned_tasks_count }}</font></td>
+                    <td align="center">
+                        <font face="Arial, Helvetica, sans-serif" size="2" color="{% if u.completed_tasks_count > 0 %}#008000{% endif %}">
+                            <b>{{ u.completed_tasks_count }}</b>
+                        </font>
+                    </td>
+                    <td align="center"><font face="Arial, Helvetica, sans-serif" size="2">{{ u.comments_count }}</font></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" align="center">
+                        <font face="Arial, Helvetica, sans-serif" size="2">No users found.</font>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+</table>
+{% endblock %}

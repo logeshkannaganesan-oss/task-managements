@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Task Management System{% endblock %}</title>
+</head>
+<body bgcolor="#F4F6F9" text="#333333">
+
+    <!-- Main Container Table -->
+    <table align="center" width="950" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+        <tr>
+            <td valign="top">
+                
+                <!-- Header Banner -->
+                <table width="100%" border="0" cellpadding="15" cellspacing="0" bgcolor="#003366">
+                    <tr>
+                        <td align="left">
+                            <font color="#FFFFFF" face="Arial, Helvetica, sans-serif" size="6">
+                                <b>Task Management System</b>
+                            </font>
+                        </td>
+                        <td align="right" valign="middle">
+                            {% if user.is_authenticated %}
+                                <font color="#FFFFFF" face="Arial, Helvetica, sans-serif" size="2">
+                                    Welcome, <b>{{ user.username }}</b> ({{ user.role }}) | 
+                                    <a href="{% url 'my_profile' %}"><font color="#FFFFFF">My Profile</font></a> | 
+                                    <a href="{% url 'logout' %}"><font color="#FFFFFF">Logout</font></a>
+                                </font>
+                            {% else %}
+                                <font color="#FFFFFF" face="Arial, Helvetica, sans-serif" size="2">
+                                    <a href="{% url 'login' %}"><font color="#FFFFFF">Login</font></a> | 
+                                    <a href="{% url 'register' %}"><font color="#FFFFFF">Register</font></a>
+                                </font>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Navigation Bar (Only for authenticated users) -->
+                {% if user.is_authenticated %}
+                <table width="100%" border="0" cellpadding="10" cellspacing="0" bgcolor="#DDDDDD">
+                    <tr>
+                        <td align="left">
+                            <font face="Arial, Helvetica, sans-serif" size="2">
+                                <b><a href="{% url 'index' %}">Dashboard</a></b> &nbsp;&nbsp;|&nbsp;&nbsp;
+                                <b><a href="{% url 'search' %}">Search & Filter</a></b> &nbsp;&nbsp;|&nbsp;&nbsp;
+                                {% if user.role == 'Admin' or user.role == 'Project Manager' %}
+                                    <b><a href="{% url 'reports' %}">Reports Dashboard</a></b> &nbsp;&nbsp;|&nbsp;&nbsp;
+                                {% endif %}
+                                {% if user.role == 'Admin' or user.role == 'Project Manager' %}
+                                    <b><a href="{% url 'project_create' %}">Create Project</a></b> &nbsp;&nbsp;|&nbsp;&nbsp;
+                                    <b><a href="{% url 'task_create' %}">Create Task</a></b>
+                                {% endif %}
+                            </font>
+                        </td>
+                    </tr>
+                </table>
+                {% endif %}
+
+                <!-- Messages Display -->
+                {% if messages %}
+                <table width="100%" border="0" cellpadding="10" cellspacing="0">
+                    <tr>
+                        <td>
+                            {% for message in messages %}
+                                <table width="100%" border="0" cellpadding="8" cellspacing="0" 
+                                       bgcolor="{% if message.tags == 'error' %}#FFCCCC{% else %}#D4EDDA{% endif %}">
+                                    <tr>
+                                        <td>
+                                            <font face="Arial, Helvetica, sans-serif" size="2" 
+                                                  color="{% if message.tags == 'error' %}#721C24{% else %}#155724{% endif %}">
+                                                {{ message }}
+                                            </font>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                </table>
+                {% endif %}
+
+                <!-- Main Content Area -->
+                <table width="100%" border="0" cellpadding="20" cellspacing="0">
+                    <tr>
+                        <td>
+                            <font face="Arial, Helvetica, sans-serif" size="3">
+                                {% block content %}{% endblock %}
+                            </font>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Divider -->
+                <hr color="#003366" size="2">
+
+                <!-- Footer -->
+                <table width="100%" border="0" cellpadding="15" cellspacing="0" bgcolor="#EAEAEA">
+                    <tr>
+                        <td align="center">
+                            <font face="Arial, Helvetica, sans-serif" size="2" color="#666666">
+                                &copy; 2026 Task Management System. Created using Django & MySQL.
+                            </font>
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>
